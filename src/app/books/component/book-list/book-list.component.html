@@ -1,0 +1,27 @@
+<ul class=list-group>
+  <li (click)="selectBook(book)" *ngFor="let book of books" [ngClass]="{ selected: book.id === selectedBook?.id}"
+      class="list-group-item">
+    {{book.title}}, <em>{{book.author}}</em>
+  </li>
+</ul>
+
+<div *ngIf="selectedBook" id="editor">
+  <p class="lead">Edit selected book</p>
+  <div class="mb-3">
+    <label class="form-label" for="title">Title</label>
+    <input #title [value]="selectedBook.title" class="form-control" id="title" type="text">
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="author">Author</label>
+    <input #author [value]="selectedBook.author" class="form-control" id="author" type="text">
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="description">Description</label>
+    <textarea #description [value]="selectedBook.description" class="form-control" id="description"
+              name="description" rows="6"></textarea>
+  </div>
+  <div class="d-grid gap-2 justify-content-md-end">
+    <button (click)="cancelEditing()" class="btn btn-light">Cancel</button>
+    <button (click)="save()" class="btn btn-primary">Save</button>
+  </div>
+</div>
