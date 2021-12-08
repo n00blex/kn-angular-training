@@ -1,0 +1,12 @@
+<label [for]="inputId" class="form-label">{{title}} <span *ngIf="mandatory">*</span></label>
+<input
+  #valueEditor
+  (blur)="performOnTouched()"
+  (input)="performOnChanged()"
+  [id]="inputId"
+  [name]="name ? name : inputId"
+  class="form-control"
+  type="text">
+<div class="invalid-feedback">
+  {{ control?.errors | errorMsg: (title | lowercase) }}
+</div>

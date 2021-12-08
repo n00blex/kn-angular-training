@@ -1,2 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/scss/bootstrap.scss";
+
+form {
+  input, textarea, app-input {
+    &.ng-invalid.ng-touched {
+      @extend .is-invalid
+    }
+  }
+}

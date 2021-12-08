@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Book} from '../model/book';
 
+const copyBook = (book: Book) => ({...book});
+
 @Injectable()
 export class BookService {
 
@@ -25,10 +27,10 @@ export class BookService {
   }
 
   getBooks(): Book[] {
-    return this.books;
+    return this.books.map(copyBook);
   }
 
   saveBook(book: Book): void {
-    this.books = this.books.map(value => value.id === book.id ? book : value);
+    this.books = this.books.map(value => value.id === book.id ? copyBook(book) : value);
   }
 }

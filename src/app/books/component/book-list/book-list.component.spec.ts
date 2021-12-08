@@ -1,6 +1,9 @@
 import {BookListComponent} from './book-list.component';
 import {BookService} from '../../service/book.service';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {SharedModule} from '../../../shared/shared.module';
+import {ErrorMsgPipe} from '../../../shared/pipes/error-msg.pipe';
 
 describe('BookListComponent', () => {
 
@@ -65,11 +68,15 @@ describe('BookListComponent', () => {
     const clickBookAt = (position: number) => bookElementAt(position).dispatchEvent(new MouseEvent('click'));
     const clickCancel = () => cancelButton().dispatchEvent(new MouseEvent('click'));
     const clickSave = () => saveButton().dispatchEvent(new MouseEvent('click'));
-    const editField = (field: HTMLInputElement | HTMLTextAreaElement, value: string) => field.value = value;
+    const editField = (field: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+      field.value = value;
+      field.dispatchEvent(new Event('input'));
+    };
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [BookListComponent],
+        declarations: [BookListComponent, ErrorMsgPipe],
+        imports: [ReactiveFormsModule, SharedModule],
         providers: [BookService]
       }).compileComponents();
     }));
@@ -121,7 +128,7 @@ describe('BookListComponent', () => {
       expect(component.selectedBook).toBeNull();
     });
 
-    it('should close editor after clicking on selected book', () => {
+    it('should close editor after clicking on cancel', () => {
       // given
       clickBookAt(1);
       fixture.detectChanges();
@@ -133,7 +140,7 @@ describe('BookListComponent', () => {
       expect(component.selectedBook).toBeNull();
     });
 
-    it('should close editor after clicking on selected book', () => {
+    it('should close editor after clicking on save',  () => {
       // given
       spyOn(bookService, 'saveBook').and.callThrough();
       clickBookAt(1);
@@ -144,6 +151,7 @@ describe('BookListComponent', () => {
       editField(title(), 'Foo');
       editField(author(), 'Bar');
       editField(description(), 'Some description');
+      fixture.detectChanges();
       clickSave();
       fixture.detectChanges();
 
