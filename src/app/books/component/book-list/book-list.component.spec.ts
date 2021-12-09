@@ -58,7 +58,7 @@ describe('BookListComponent', () => {
     });
 
     it('should has no selected book', () => {
-      expect(component.selectedBook).toBeNull();
+      expect(component.selectedBook$).toBeNull();
     });
 
     it('should allow to select a book', () => {
@@ -69,7 +69,7 @@ describe('BookListComponent', () => {
       component.selectBook(toBeSelected);
 
       // then
-      expect(component.selectedBook).toEqual(toBeSelected);
+      expect(component.selectedBook$).toEqual(toBeSelected);
     });
 
     it('should allow cancel', () => {
@@ -81,7 +81,7 @@ describe('BookListComponent', () => {
       component.cancelEditing();
 
       // then
-      expect(component.selectedBook).toBeNull();
+      expect(component.selectedBook$).toBeNull();
     });
   });
 
@@ -137,7 +137,7 @@ describe('BookListComponent', () => {
 
     it('should select book on clicking', () => {
       // given
-      expect(component.selectedBook).toBeNull();
+      expect(component.selectedBook$).toBeNull();
       expect(editor()).toBeFalsy();
       // when
       clickBookAt(1);
@@ -145,7 +145,7 @@ describe('BookListComponent', () => {
       // then
       expect(editor()).toBeTruthy();
       let selectedBook = books()[1];
-      expect(component.selectedBook).toEqual(selectedBook);
+      expect(component.selectedBook$).toEqual(selectedBook);
       expect(title().value).toEqual(selectedBook.title);
       expect(author().value).toEqual(selectedBook.author);
       expect(description().value).toEqual(selectedBook.description);
@@ -161,7 +161,7 @@ describe('BookListComponent', () => {
       fixture.detectChanges();
       // then
       expect(editor()).toBeFalsy();
-      expect(component.selectedBook).toBeNull();
+      expect(component.selectedBook$).toBeNull();
     });
 
     it('should close editor after clicking on cancel', () => {
@@ -173,7 +173,7 @@ describe('BookListComponent', () => {
       fixture.detectChanges();
       // then
       expect(editor()).toBeFalsy();
-      expect(component.selectedBook).toBeNull();
+      expect(component.selectedBook$).toBeNull();
     });
 
     it('should close editor after clicking on save', () => {

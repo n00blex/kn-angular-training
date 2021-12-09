@@ -13,7 +13,7 @@ export class BookDetailsComponent implements OnChanges {
   readonly formGroup: FormGroup;
 
   @Input()
-  selectedBook!: Book;
+  selectedBook!: Book | null;
 
   @Output()
   editedBook = new EventEmitter<Book>();
@@ -39,7 +39,7 @@ export class BookDetailsComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log(changes)
-    if (changes.selectedBook) {
+    if (changes.selectedBook && this.selectedBook) {
       this.formGroup.patchValue({
         title: this.selectedBook.title,
         author: this.selectedBook.author,

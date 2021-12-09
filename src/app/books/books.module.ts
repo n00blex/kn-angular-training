@@ -5,8 +5,10 @@ import {BookService} from './service/book.service';
 import {ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../shared/shared.module';
 import {HttpClientModule} from '@angular/common/http';
-import { BookDetailsComponent } from './component/book-details/book-details.component';
-import { EditionDetailsComponent } from './component/book-details/edition-details/edition-details.component';
+import {BookDetailsComponent} from './component/book-details/book-details.component';
+import {EditionDetailsComponent} from './component/book-details/edition-details/edition-details.component';
+import {StoreModule} from '@ngrx/store';
+import {BOOKS_FEATURE, booksStateReducer} from './store/books.reducer';
 
 @NgModule({
   declarations: [
@@ -18,7 +20,8 @@ import { EditionDetailsComponent } from './component/book-details/edition-detail
     CommonModule,
     SharedModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    StoreModule.forFeature(BOOKS_FEATURE, booksStateReducer)
   ],
   exports: [
     BookListComponent,

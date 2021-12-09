@@ -3,6 +3,10 @@ import {Book} from '../../model/book';
 import {BookService} from '../../service/book.service';
 import {Observable, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {select, Store} from '@ngrx/store';
+import {BooksState} from '../../store/books.reducer';
+import {deselectBooksAction, selectBooksAction, setBooksAction} from '../../store/books.actions';
+import {BooksSelectors} from '../../store/books.selectors';
 
 @Component({
   selector: 'app-book-list',
@@ -12,12 +16,23 @@ import {takeUntil} from 'rxjs/operators';
 export class BookListComponent implements OnDestroy {
 
   books$: Observable<Book[]>;
-  selectedBook: Book | null = null;
+  readonly selectedBook$: Observable<Book | null>;
+  selectedBookId: number | undefined = undefined;
 
   private readonly unSubscribe = new Subject();
 
-  constructor(private readonly bookService: BookService) {
-    this.books$ = this.bookService.getBooks();
+  constructor(private readonly bookService: BookService, private readonly store: Store<BooksState>) {
+    this.bookService.getBooks()
+      .pipe(
+        takeUntil(this.unSubscribe))
+      .subscribe(books =>
+        this.store.dispatch(setBooksAction({books}))
+      );
+    this.books$ = this.store.pipe(select(BooksSelectors.getBooks));
+    this.selectedBook$ = this.store.pipe(select(BooksSelectors.getSelectedBook));
+    this.selectedBook$.pipe(takeUntil(this.unSubscribe)).subscribe(
+      book => book ? this.selectedBookId = book.id : this.selectedBookId = undefined
+    );
   }
 
   ngOnDestroy(): void {
@@ -26,26 +41,24 @@ export class BookListComponent implements OnDestroy {
   }
 
   selectBook(book: Book): void {
-    if (this.selectedBook?.id === book.id) {
-      this.selectedBook = null;
+    if (this.selectedBookId === book.id) {
+      this.cancelEditing();
     } else {
-      this.selectedBook = book;
+      this.store.dispatch(selectBooksAction({book}));
     }
   }
 
   save(book: Book): void {
-    if (this.selectedBook) {
-      this.bookService.saveBook({...this.selectedBook, ...book})
+    this.bookService.saveBook(book).pipe(takeUntil(this.unSubscribe)).subscribe(_ => {
+      this.bookService.getBooks()
         .pipe(takeUntil(this.unSubscribe))
-        .subscribe(_ => {
-          this.selectedBook = null;
-          this.books$ = this.bookService.getBooks();
-        });
-    }
+        .subscribe(books => this.store.dispatch(setBooksAction({ books })));
+      this.store.dispatch(deselectBooksAction());
+    });
   }
 
   cancelEditing(): void {
-    this.selectedBook = null;
+    this.store.dispatch(deselectBooksAction());
   }
 
 }
