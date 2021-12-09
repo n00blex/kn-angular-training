@@ -1,0 +1,22 @@
+<ng-container [formGroup]="formGroup">
+  <div class="mb-3">
+    <app-input
+      formControlName="publisher"
+      inputId="publisher"
+      title="Publisher"
+      [mandatory]="true">
+    </app-input>
+    <app-input
+      formControlName="publishYear"
+      inputId="publishYear"
+      title="Publish Year"
+      [mandatory]="true">
+    </app-input>
+    <app-input
+      formControlName="editionNumber"
+      inputId="editionNumber"
+      title="Edition Number"
+      [mandatory]="true">
+    </app-input>
+  </div>
+</ng-container>

@@ -1,29 +1,28 @@
-import {Component} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {Book} from '../../model/book';
 import {BookService} from '../../service/book.service';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {Observable, Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-book-list',
   templateUrl: './book-list.component.html',
   styleUrls: ['./book-list.component.scss']
 })
-export class BookListComponent {
+export class BookListComponent implements OnDestroy {
 
-  books: Book[] = [];
+  books$: Observable<Book[]>;
   selectedBook: Book | null = null;
-  readonly formGroup: FormGroup;
+
+  private readonly unSubscribe = new Subject();
 
   constructor(private readonly bookService: BookService) {
-    this.books = this.bookService.getBooks();
-    this.formGroup = new FormGroup({
-      title: new FormControl('', [Validators.required, Validators.maxLength(30)]),
-      author: new FormControl({
-        value: '',
-        disabled: false
-      }, [Validators.required, Validators.minLength(2), Validators.maxLength(20)]),
-      description: new FormControl('', [Validators.maxLength(100)])
-    })
+    this.books$ = this.bookService.getBooks();
+  }
+
+  ngOnDestroy(): void {
+    this.unSubscribe.next();
+    this.unSubscribe.complete();
   }
 
   selectBook(book: Book): void {
@@ -31,19 +30,17 @@ export class BookListComponent {
       this.selectedBook = null;
     } else {
       this.selectedBook = book;
-      this.formGroup.reset({
-        title: this.selectedBook.title,
-        author: this.selectedBook.author,
-        description: this.selectedBook.description,
-      })
     }
   }
 
-  save(): void {
+  save(book: Book): void {
     if (this.selectedBook) {
-      this.bookService.saveBook({...this.selectedBook, ...this.formGroup.value});
-      this.selectedBook = null;
-      this.books = this.bookService.getBooks();
+      this.bookService.saveBook({...this.selectedBook, ...book})
+        .pipe(takeUntil(this.unSubscribe))
+        .subscribe(_ => {
+          this.selectedBook = null;
+          this.books$ = this.bookService.getBooks();
+        });
     }
   }
 
